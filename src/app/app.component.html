@@ -1,0 +1,30 @@
+<div>
+  <input type="text" name="user" id="user" #user placeholder="Type your username">
+  <button type="button" (click)="connect(user.value); user.value = '';" >Connect</button>
+</div>
+<div>
+  <h1>Connected users</h1>
+  <table *ngFor="let userConnection of usersConnections">
+    <thead>
+    <tr>
+      <th>
+        {{userConnection.user}}
+        <button type="button" (click)="disconnect(userConnection.user)">Disconnect</button>
+      </th>
+    </tr>
+    <tr>
+      <th>
+        <input type="text" name="message" id="message" #message>
+        <button type="button" (click)="send(userConnection.user, message.value)">Send</button>
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let message of userConnection.messages">
+        <td [colSpan]="2">
+          {{message}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
