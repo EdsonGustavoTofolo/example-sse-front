@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { UserApiService } from "./user-api.service";
 import { NotificationService } from "./notification.service";
 import { MessageRequest } from "./message-request";
@@ -14,8 +14,7 @@ export class AppComponent {
   usersConnections: { user: string, messages: string[], subscription: Subscription }[] = [];
 
   constructor(private userApiService: UserApiService,
-              private notificationService: NotificationService,
-              private cdRef: ChangeDetectorRef) {}
+              private notificationService: NotificationService) {}
 
   send(user: string, message: string): void {
     const messageRequest = new MessageRequest();
@@ -29,7 +28,6 @@ export class AppComponent {
     const usersConnection = this.usersConnections[userConnectionIndex];
     usersConnection.subscription.unsubscribe();
     this.usersConnections.splice(userConnectionIndex, 1);
-    this.cdRef.detectChanges();
     this.notificationService.closeConnection(user);
   }
 
@@ -37,7 +35,6 @@ export class AppComponent {
     const subscription = this.notificationService.getMessages(user).subscribe(eventSourceMessage => {
       if (eventSourceMessage.messageType === 'onopen') {
         this.usersConnections.push({ 'user': user,  'messages': [], 'subscription': subscription });
-        this.cdRef.detectChanges();
       } else if (eventSourceMessage.messageType === 'message') {
         const userConnection = this.usersConnections.find(value => value.user === user);
         userConnection?.messages.push(<string>eventSourceMessage.messageNotification!.message);

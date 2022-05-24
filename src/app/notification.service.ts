@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Observable, Subject } from "rxjs";
 import { MessageNotification } from "./message-notification";
 import { EventSourceMessage } from "./event-source-message";
@@ -12,7 +12,7 @@ export class NotificationService {
 
   private events: { user: string, eventSource: EventSource, listeners: EventSourceListener[], onMessage: Observable<EventSourceMessage>  }[] = [];
 
-  constructor() { }
+  constructor(private ngZone: NgZone) { }
 
   getMessages(user: string): Observable<EventSourceMessage> {
     const subject = new Subject<EventSourceMessage>();
@@ -24,7 +24,7 @@ export class NotificationService {
     }
 
     const eventSource = new EventSource(`http://localhost:8080/api/sses/stream/${user}`);
-    eventSource.onopen = () => subject.next({ messageType: 'onopen' });
+    eventSource.onopen = () => this.ngZone.run(() => subject.next({ messageType: 'onopen' }));
     eventSource.onerror = ev => console.log("Error", ev);
     eventSource.addEventListener('message', listener);
 
